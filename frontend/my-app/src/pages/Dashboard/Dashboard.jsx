@@ -1,70 +1,108 @@
 // src/pages/Dashboard.jsx
 import React, { useState, useEffect } from 'react'
 import { useProducts } from '../../features/products/hooks/useProducts'
+import { useLocations } from '../../features/locations/hooks/useLocations'
+import { useTransactions } from '../../features/transactions/hooks/useTransactions'
+import { useUsers } from '../../features/users/hooks/useUsers'
 import './Dashboard.css'
 
 const Dashboard = () => {
-  const { products, loading } = useProducts()
+  const { products, loading: productsLoading } = useProducts()
+  const { locations, loading: locationsLoading } = useLocations()
+  const { transactions, loading: transactionsLoading } = useTransactions()
+  const { users, loading: usersLoading } = useUsers()
+
   const [dashboardStats, setDashboardStats] = useState({
     totalProducts: 0,
     lowStockItems: 0,
     totalValue: 0,
-    categories: 0,
-    recentTransactions: 0
+    totalLocations: 0,
+    totalTransactions: 0,
+    totalUsers: 0,
+    stockInToday: 0,
+    stockOutToday: 0,
+    activeUsers: 0
   })
+
   const [lowStockProducts, setLowStockProducts] = useState([])
+  const [recentTransactions, setRecentTransactions] = useState([])
   const [topCategories, setTopCategories] = useState([])
 
   // Calculate dashboard statistics
   useEffect(() => {
-    if (products.length > 0) {
-      // Calculate total products
-      const totalProducts = products.length
+    // Products statistics
+    const totalProducts = products.length
+    const lowStock = products.filter(product => 
+      product.quantity <= (product.threshold || 10)
+    )
+    const lowStockItems = lowStock.length
+    setLowStockProducts(lowStock.slice(0, 5))
 
-      // Calculate low stock items (quantity <= threshold)
-      const lowStock = products.filter(product => 
-        product.quantity <= (product.threshold || 10)
-      )
-      const lowStockItems = lowStock.length
-      setLowStockProducts(lowStock.slice(0, 5)) // Show top 5 low stock items
+    const totalValue = products.reduce((sum, product) => 
+      sum + (product.price * product.quantity), 0
+    )
 
-      // Calculate total inventory value
-      const totalValue = products.reduce((sum, product) => 
-        sum + (product.price * product.quantity), 0
-      )
+    // Categories analysis
+    const uniqueCategories = [...new Set(products.map(p => p.category).filter(Boolean))]
+    const categoryStats = uniqueCategories.map(category => {
+      const categoryProducts = products.filter(p => p.category === category)
+      return {
+        name: category,
+        count: categoryProducts.length,
+        value: categoryProducts.reduce((sum, p) => sum + (p.price * p.quantity), 0)
+      }
+    }).sort((a, b) => b.count - a.count)
+    setTopCategories(categoryStats.slice(0, 3))
 
-      // Calculate unique categories
-      const uniqueCategories = [...new Set(products.map(p => p.category).filter(Boolean))]
-      const categories = uniqueCategories.length
+    // Locations statistics
+    const totalLocations = locations.length
 
-      // Calculate category distribution
-      const categoryStats = uniqueCategories.map(category => {
-        const categoryProducts = products.filter(p => p.category === category)
-        return {
-          name: category,
-          count: categoryProducts.length,
-          value: categoryProducts.reduce((sum, p) => sum + (p.price * p.quantity), 0)
-        }
-      }).sort((a, b) => b.count - a.count)
-      setTopCategories(categoryStats.slice(0, 5))
+    // Transactions statistics
+    const totalTransactions = transactions.length
+    const today = new Date().toDateString()
+    const todayTransactions = transactions.filter(t => 
+      new Date(t.timestamp).toDateString() === today
+    )
+    const stockInToday = todayTransactions.filter(t => t.type === 'IN').length
+    const stockOutToday = todayTransactions.filter(t => t.type === 'OUT').length
+    
+    // Recent transactions (last 5)
+    const sortedTransactions = [...transactions]
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+    setRecentTransactions(sortedTransactions.slice(0, 5))
 
-      setDashboardStats({
-        totalProducts,
-        lowStockItems,
-        totalValue,
-        categories,
-        recentTransactions: 0 // Will be updated when transaction feature is added
-      })
-    }
-  }, [products])
+    // Users statistics
+    const totalUsers = users.length
+    const activeUsers = users.filter(u => (u.status || 'ACTIVE') === 'ACTIVE').length
 
-  if (loading) {
+    setDashboardStats({
+      totalProducts,
+      lowStockItems,
+      totalValue,
+      totalLocations,
+      totalTransactions,
+      totalUsers,
+      stockInToday,
+      stockOutToday,
+      activeUsers
+    })
+  }, [products, locations, transactions, users])
+
+  const isLoading = productsLoading || locationsLoading || transactionsLoading || usersLoading
+
+  if (isLoading) {
     return (
       <div className="dashboard-loading">
         <h1>Dashboard</h1>
         <p>Loading dashboard data...</p>
       </div>
     )
+  }
+
+  // Helper function to get product name
+  const getProductName = (productId) => {
+    const product = products.find(p => p.id === productId)
+    return product ? product.name : `Product ID: ${productId}`
   }
 
   return (
@@ -104,11 +142,52 @@ const Dashboard = () => {
         </div>
 
         <div className="metric-card info">
-          <div className="metric-icon">📊</div>
+          <div className="metric-icon">📍</div>
           <div className="metric-content">
-            <h3>Product Categories</h3>
-            <p className="metric-value">{dashboardStats.categories}</p>
-            <span className="metric-label">Different categories</span>
+            <h3>Locations</h3>
+            <p className="metric-value">{dashboardStats.totalLocations}</p>
+            <span className="metric-label">Active locations</span>
+          </div>
+        </div>
+
+        <div className="metric-card">
+          <div className="metric-icon">📋</div>
+          <div className="metric-content">
+            <h3>Total Transactions</h3>
+            <p className="metric-value">{dashboardStats.totalTransactions}</p>
+            <span className="metric-label">All time transactions</span>
+          </div>
+        </div>
+
+        <div className="metric-card">
+          <div className="metric-icon">👥</div>
+          <div className="metric-content">
+            <h3>Active Users</h3>
+            <p className="metric-value">{dashboardStats.activeUsers}</p>
+            <span className="metric-label">of {dashboardStats.totalUsers} total users</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Today's Activity */}
+      <div className="activity-summary">
+        <h2>📈 Today's Activity</h2>
+        <div className="activity-cards">
+          <div className="activity-card stock-in">
+            <div className="activity-icon">📈</div>
+            <div className="activity-info">
+              <h3>Stock In</h3>
+              <p className="activity-count">{dashboardStats.stockInToday}</p>
+              <span>transactions today</span>
+            </div>
+          </div>
+          <div className="activity-card stock-out">
+            <div className="activity-icon">📉</div>
+            <div className="activity-info">
+              <h3>Stock Out</h3>
+              <p className="activity-count">{dashboardStats.stockOutToday}</p>
+              <span>transactions today</span>
+            </div>
           </div>
         </div>
       </div>
@@ -144,10 +223,41 @@ const Dashboard = () => {
           </div>
         </div>
 
+        {/* Recent Transactions */}
+        <div className="dashboard-section">
+          <div className="section-header">
+            <h2>📋 Recent Transactions</h2>
+            <span className="section-count">({recentTransactions.length})</span>
+          </div>
+          <div className="recent-transactions">
+            {recentTransactions.length === 0 ? (
+              <p className="no-data">No recent transactions</p>
+            ) : (
+              recentTransactions.map(transaction => (
+                <div key={transaction.id} className="transaction-item">
+                  <div className="transaction-icon">
+                    {transaction.type === 'IN' ? '📈' : '📉'}
+                  </div>
+                  <div className="transaction-info">
+                    <h4>{getProductName(transaction.productId)}</h4>
+                    <p>
+                      {transaction.type === 'IN' ? '+' : '-'}{transaction.quantity} units
+                      {transaction.userId && ` by ${transaction.userId}`}
+                    </p>
+                    <span className="transaction-time">
+                      {new Date(transaction.timestamp).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
         {/* Top Categories */}
         <div className="dashboard-section">
           <div className="section-header">
-            <h2>📈 Top Categories</h2>
+            <h2>📊 Top Categories</h2>
             <span className="section-count">({topCategories.length})</span>
           </div>
           <div className="categories-list">
@@ -180,19 +290,13 @@ const Dashboard = () => {
               className="action-btn primary"
               onClick={() => window.location.href = '/products'}
             >
-              📦 View All Products
-            </button>
-            <button 
-              className="action-btn secondary"
-              onClick={() => window.location.href = '/products?filter=lowstock'}
-            >
-              ⚠️ Manage Low Stock
+              📦 Manage Products
             </button>
             <button 
               className="action-btn secondary"
               onClick={() => window.location.href = '/transactions'}
             >
-              📋 View Transactions
+              📋 Record Transaction
             </button>
             <button 
               className="action-btn secondary"
@@ -200,35 +304,32 @@ const Dashboard = () => {
             >
               📍 Manage Locations
             </button>
+            <button 
+              className="action-btn secondary"
+              onClick={() => window.location.href = '/users'}
+            >
+              👥 Manage Users
+            </button>
           </div>
         </div>
 
-        {/* Recent Activity */}
+        {/* System Status */}
         <div className="dashboard-section">
           <div className="section-header">
-            <h2>📅 Recent Activity</h2>
+            <h2>🔧 System Status</h2>
           </div>
-          <div className="recent-activity">
-            <div className="activity-item">
-              <div className="activity-icon">✅</div>
-              <div className="activity-content">
-                <p>Dashboard loaded successfully</p>
-                <span className="activity-time">Just now</span>
-              </div>
+          <div className="system-status">
+            <div className="status-item">
+              <div className="status-indicator active"></div>
+              <span>Database Connected</span>
             </div>
-            <div className="activity-item">
-              <div className="activity-icon">📊</div>
-              <div className="activity-content">
-                <p>Inventory data synchronized</p>
-                <span className="activity-time">2 minutes ago</span>
-              </div>
+            <div className="status-item">
+              <div className="status-indicator active"></div>
+              <span>API Services Online</span>
             </div>
-            <div className="activity-item">
-              <div className="activity-icon">🔄</div>
-              <div className="activity-content">
-                <p>System status: All services operational</p>
-                <span className="activity-time">5 minutes ago</span>
-              </div>
+            <div className="status-item">
+              <div className="status-indicator active"></div>
+              <span>All Systems Operational</span>
             </div>
           </div>
         </div>

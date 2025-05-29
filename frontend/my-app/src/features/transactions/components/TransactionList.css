@@ -1,0 +1,112 @@
+/* src/features/transactions/components/TransactionList.css */
+.transaction-list {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.data-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #495057;
+}
+
+.transaction-date {
+  font-size: 14px;
+  color: #495057;
+}
+
+.product-info {
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.transaction-type {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.transaction-type--in {
+  background: #d4edda;
+  color: #155724;
+}
+
+.transaction-type--out {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.quantity {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.quantity--in {
+  color: #28a745;
+}
+
+.quantity--out {
+  color: #dc3545;
+}
+
+.user-info {
+  color: #6c757d;
+  font-size: 14px;
+}
+
+.transaction-notes {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #6c757d;
+  font-size: 14px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6c757d;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.empty-state h3 {
+  margin: 0 0 8px 0;
+  color: #495057;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 14px;
+}

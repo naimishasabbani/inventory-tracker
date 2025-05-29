@@ -1,0 +1,141 @@
+/* src/features/users/components/UserList.css */
+.user-list {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.data-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #495057;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-icon {
+  font-size: 20px;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.username {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+.user-id {
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.user-email {
+  color: #495057;
+  font-size: 14px;
+}
+
+.user-role {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.user-role--admin {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.user-role--manager {
+  background: #d4edda;
+  color: #155724;
+}
+
+.user-role--staff {
+  background: #cce5ff;
+  color: #004085;
+}
+
+.user-role--viewer {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.created-date {
+  color: #6c757d;
+  font-size: 14px;
+}
+
+.user-status {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.user-status--active {
+  background: #d4edda;
+  color: #155724;
+}
+
+.user-status--inactive {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.user-status--suspended {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6c757d;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.empty-state h3 {
+  margin: 0 0 8px 0;
+  color: #495057;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 14px;
+}

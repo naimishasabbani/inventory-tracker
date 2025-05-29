@@ -29,3 +29,63 @@ body {
 .product-form {
   max-width: 500px;
 }
+
+/* Add to src/index.css */
+.textarea {
+  min-height: 80px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.input-group {
+  margin-bottom: 16px;
+}
+
+.input-label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+  color: #333;
+}
+
+.required {
+  color: #dc3545;
+}
+
+.input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.input--error {
+  border-color: #dc3545;
+}
+
+.input-error {
+  display: block;
+  margin-top: 4px;
+  color: #dc3545;
+  font-size: 12px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.location-form {
+  max-width: 500px;
+}
